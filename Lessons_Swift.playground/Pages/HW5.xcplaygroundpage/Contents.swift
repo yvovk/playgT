@@ -41,7 +41,7 @@ for (key, values) in gameResults {
  */
 
 //my sollutin that not working well:)
-func ageCount (day dnumber: Int,month mnumber: Int, year ynumber: Int) {
+/*func ageCount (day dnumber: Int,month mnumber: Int, year ynumber: Int) {
    
     let date = Date()
     let calendar = Calendar.current
@@ -70,7 +70,7 @@ func ageCount (day dnumber: Int,month mnumber: Int, year ynumber: Int) {
     //calculate days
     if currentDay > dnumber {
         dayResult = currentDay - dnumber // for this case calcultaing right
-    } else if currentDay < dnumber {
+    } else if currentDay < 0 {
         //need to think more on this
        
     } else if currentDay == dnumber {
@@ -80,7 +80,7 @@ func ageCount (day dnumber: Int,month mnumber: Int, year ynumber: Int) {
     print("Survived for \(dayResult) days, \(monthResult) month and \(yearResult) years")
 }
 
-print(ageCount(day: 2, month: 11, year: 1995))
+print(ageCount(day: 2, month: 11, year: 1995))*/
 
 
 // answer
@@ -227,4 +227,113 @@ func getFibonacciArrayV3(n:Int)->[Int]{
 }
 getFibonacciArrayV3(n: 6)
 
-//test
+
+
+
+/*### Задание 2
+Создайте функцию которая принимает в качестве аргументов день, месяц и год вашего рождения и делает расчет полных прожитых вами дней, месяцев и лет с момента вашего рождения. При вызове функции на консоль должно выходить то же самое сообщение, что и в предыдущих заданиях
+*/
+//New sollution for this task
+// функція для виведення привітання з днем народження
+func birthDayGreet(years: Int) -> Void {
+  print(
+  "WOW, you have birthday today. You are \(years) old!",
+  terminator: "\n"
+  )
+}
+
+// функція для створення дати за роком, місяцем та днем. Потрібна для того, щоб створити дату з першим числом попереднього місяця і використати в функції нижче
+func makeDate(year: Int, month: Int, day: Int) -> Date {
+  let calendar = Calendar(identifier: .gregorian)
+  let components = DateComponents(year: year, month: month, day: day)
+  return calendar.date(from: components)!
+}
+
+// функція для  отримання кількості днів з дати. Повертає число: 28, 30, 31
+func daysInMonth(date: Date) -> Int {
+  let calendar = Calendar.current
+  let interval = calendar.dateInterval(of: .month, for: date)!
+  let days = calendar.dateComponents([.day], from: interval.start, to: interval.end).day!
+  return days
+}
+
+func differenceBetweenBirthAndCurrentDate(birthDay: Int, birthMonth: Int, birthYear: Int) -> Void  {
+    let date = Date()
+    let calendar = Calendar.current
+    let fullMonthsAmount = 12
+ 
+    let currentYear = calendar.component(.year, from: date)
+    let currentMonth = calendar.component(.month, from: date)
+    let currentDay = calendar.component(.day, from: date)
+
+    // змінні де будуть записуватись прожиті дні, місяці, роки
+    var livedDays = 0
+    var livedMonths = 0
+    var livedYears = 0
+ 
+    livedYears = currentYear - birthYear
+    // якщо збігається день та місяць поточної та дати народження - отже сьогодні день народження з точним числом скільки років
+    if (currentDay == birthDay && currentMonth == birthMonth) {
+      birthDayGreet(years: livedYears)
+      return
+    }
+
+    let monthsDiff = currentMonth - birthMonth
+    let daysDiff = currentDay - birthDay
+
+    if (daysDiff == 0) {
+      if (monthsDiff > 0) {
+        livedMonths = monthsDiff
+      } else {
+        livedYears -= 1
+        livedMonths = fullMonthsAmount - abs(monthsDiff)
+      }
+    }
+
+    if (daysDiff > 0) {
+      if (monthsDiff > 0) {
+        livedMonths = monthsDiff
+      } else {
+        livedYears -= 1
+        // abs функція(математична і вже вбудована), яка перетворює число на позитивне. Тобто позитивне залишається позитивним, а негативне робить негативним. Приклад - число "7" буде "7", а число "-2" буде "2"
+
+        // від загальної кількості місяців віднімаємо різницю місяців, але з ковертацією до позитивного числа, щоб не вийшло більше 12 :)
+        livedMonths = fullMonthsAmount - abs(monthsDiff)
+      }
+      livedDays = daysDiff
+    }
+
+    if (daysDiff < 0) {
+      // попередньо створюємо дату з першим днем попереднього місяця і визначаємо скільки було днів в ньому. Це потрібно тому, що різниця днів є меншою, а ніж нуль - що означає, що з попереднього місяця нам потрібно забрати якусь кількість днів
+      let previousMonth = makeDate(year: birthYear, month: currentMonth - 1, day: 1)
+      let daysInPreviousMonth = daysInMonth(date: previousMonth)
+      if (monthsDiff > 0) {
+        livedMonths = monthsDiff - 1
+        livedDays = daysInPreviousMonth - abs(daysDiff)
+      } else {
+        livedYears -= 1
+        livedMonths = fullMonthsAmount - abs(monthsDiff) - 1
+        livedDays = daysInPreviousMonth - abs(daysDiff)
+      }
+    }
+
+    print("Your age: \(livedYears) year(s), \(livedMonths) month(s), \(livedDays) day(s)")
+}
+
+// 27 years, 1 month, 18 days
+print(differenceBetweenBirthAndCurrentDate(birthDay: 14, birthMonth: 5, birthYear: 1995))
+
+// 26 years, 7 months, 28 days
+print(differenceBetweenBirthAndCurrentDate(birthDay: 4, birthMonth: 11, birthYear: 1995))
+
+// 22 years, 0 months, 29 days
+print(differenceBetweenBirthAndCurrentDate(birthDay: 3, birthMonth: 6, birthYear: 2000))
+
+// 21 years, 8 months, 28 days
+print(differenceBetweenBirthAndCurrentDate(birthDay: 4, birthMonth: 10, birthYear: 2000))
+
+// 20 years
+print(differenceBetweenBirthAndCurrentDate(birthDay: 2, birthMonth: 7, birthYear: 2002))
+
+// 21 years, 6 months, 20 days
+print(differenceBetweenBirthAndCurrentDate(birthDay: 12, birthMonth: 12, birthYear: 2000))
